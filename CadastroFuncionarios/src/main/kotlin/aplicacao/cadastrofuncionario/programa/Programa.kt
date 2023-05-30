@@ -7,16 +7,16 @@ import java.util.*
 import kotlin.system.exitProcess
 
 fun main(){
-    menu()
-}
-
-fun menu(){
-    val sc = Scanner(System.`in`)
     var filePath = "arquivo\\BancoDeDados.csv"
     var file = Arquivo(File(filePath))
-    var opcao = 1;
-
     inicializaPrograma(file)
+
+    menu(file)
+}
+
+fun menu(file: Arquivo) {
+    val sc = Scanner(System.`in`)
+    var opcao = 1;
 
     while(opcao != 0){
         print("\n----- Menu -----")
@@ -84,8 +84,17 @@ fun alteraFuncionario(file: Arquivo){
     val index = file.pesquisaLinhaPorIdentificador(nome)
     if (index == -1) {
         println("\nEste funcionário não foi encontrado.")
-        menu()
+        menu(file)
     }
+
+    val countIdentificadores = file.verificaRepeticaoIdentificador(nome)
+    if(countIdentificadores > 1){
+        print("\nExiste mais de um funcionário com esse nome! O primeiro registro será alterado. " +
+                "\nDeseja continuar? \n1 - Sim \n2 - Não \nOpção: ")
+        if(sc.nextInt() == 2)
+            menu(file)
+    }
+    sc.nextLine()
 
     print("\nInforme um novo cargo para $nome: ")
     val cargo = sc.nextLine()
@@ -109,7 +118,15 @@ fun removeFuncionario(file: Arquivo){
     val index = file.pesquisaLinhaPorIdentificador(nome)
     if (index == -1) {
         println("\nEste funcionário não foi encontrado.")
-        menu()
+        menu(file)
+    }
+
+    val countIdentificadores = file.verificaRepeticaoIdentificador(nome)
+    if(countIdentificadores > 1){
+        print("\nExiste mais de um funcionário com esse nome! O primeiro registro será apagado. " +
+                "\nDeseja continuar? \n1 - Sim \n2 - Não \nOpção: ")
+        if(sc.nextInt() == 2)
+            menu(file)
     }
 
     file.removerLinhaArquivo(index)

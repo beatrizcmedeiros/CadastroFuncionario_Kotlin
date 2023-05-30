@@ -74,6 +74,16 @@ class Arquivo(private val file: File) {
         return -1
     }
 
+    fun verificaRepeticaoIdentificador(identificador: String): Int {
+        var count = 0
+        for (line in lerTotasAsLinhasArquivo()) {
+            val ln = line.split(" ")
+            for (i in ln)
+                count++
+        }
+        return count
+    }
+
     fun imprimirLinhasArquivo(lines: List<String>){
         var id = 1
         for (line in lines) {
@@ -83,12 +93,13 @@ class Arquivo(private val file: File) {
             val cargo = fields[1]
             val salario = fields[2]
             if(fields[0] == "Nome do Funcionário")
-                println("ID \t\t | \t $nome \t | \t $cargo \t | \t $salario")
+                println("\n\nID \t\t | \t $nome \t | \t $cargo \t | \t $salario")
             else {
                 println("$id \t\t | \t $nome \t\t | \t\t\t $cargo \t\t\t | \t\t\t R$$salario")
                 id++
             }
         }
+        println()
     }
 
 }//class Arquivo
