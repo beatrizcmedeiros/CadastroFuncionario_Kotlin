@@ -1,9 +1,8 @@
 package aplicacao.cadastrofuncionario.programa
 
+import aplicacao.cadastrofuncionario.classe.Arquivo
 import aplicacao.cadastrofuncionario.classe.Funcionario
 import java.io.File
-import java.io.FileReader
-import java.io.FileWriter
 import java.util.*
 import kotlin.system.exitProcess
 
@@ -14,10 +13,10 @@ fun main(){
 fun menu(){
     val sc = Scanner(System.`in`)
     var filePath = "arquivo\\BancoDeDados.csv"
+    var file = Arquivo(File(filePath))
     var opcao = 1;
 
-    var file = File(filePath)
-    inicializaArquivo(file)
+    inicializaPrograma(file)
 
     while(opcao != 0){
         print("\n----- Menu -----")
@@ -43,36 +42,22 @@ fun menu(){
     }
 }
 
-fun inicializaArquivo(file: File){
+fun inicializaPrograma(file: Arquivo) {
+    val sc = Scanner(System.`in`)
 
-    if(file.length() > 1){
-        val sc = Scanner(System.`in`)
+    if(file.verificaArquivoVazio()){
+        file.inicializaArquivo()
+    }else{
         print("\nO banco de dados possui dados armazenados, deseja limpa-ló? \n1 - Sim \n2 - Não \nOpção: ")
         var opcao = sc.nextInt()
 
-        if(opcao == 1){
-            val writer = FileWriter(file)
-
-            writer.write("Nome do Funcionário,Cargo do Funcionário,Salário\n")
-            writer.close()
-        } else{
-            return
-        }
-    }else{
-        val writer = FileWriter(file)
-
-        writer.write("Nome do Funcionário,Cargo do Funcionário,Salário\n")
-        writer.close()
+        if(opcao == 1)
+            file.inicializaArquivo()
     }
 }
 
-fun cadastraFuncionario(file: File){
+fun cadastraFuncionario(file: Arquivo){
     val sc = Scanner(System.`in`)
-
-    val reader = FileReader(file)
-
-    val lines = reader.readLines().toMutableList()
-    reader.close()
 
     print("\n\n----- Cadastro do Novo Funcionário -----\n")
     print("\nInforme o nome do funcionário: ")
@@ -84,35 +69,19 @@ fun cadastraFuncionario(file: File){
 
     val novoFuncionario = Funcionario(nome, cargo, salario)
 
-    lines.add(novoFuncionario.toString())
-
-    val writer = FileWriter(file)
-    writer.write(lines.joinToString("\n"))
-    writer.close()
+    file.adicionarLinhaArquivo(novoFuncionario.toString())
 
     println("\nFuncionário cadastrado com sucesso!")
 }
 
-fun alteraFuncionario(file: File){
+fun alteraFuncionario(file: Arquivo){
     val sc = Scanner(System.`in`)
-    val reader = FileReader(file)
 
     print("\n\n----- Alterar Funcionário -----\n")
     print("\nInforme o nome do funcionário que deseja alterar: ")
     val nome = sc.nextLine()
 
-    val lines = reader.readLines().toMutableList()
-    reader.close()
-
-    var index = -1
-    for ((i, line) in lines.withIndex()) {
-        val fields = line.split(",")
-        if (fields[0] == nome) {
-            index = i
-            break
-        }
-    }
-
+    val index = file.pesquisaLinhaPorIdentificador(nome)
     if (index == -1) {
         println("\nEste funcionário não foi encontrado.")
         menu()
@@ -125,73 +94,35 @@ fun alteraFuncionario(file: File){
     val salario = sc.nextDouble()
 
     val funcionario = Funcionario(nome, cargo, salario)
-
-    lines[index] = funcionario.toString()
-
-    val writer = FileWriter(file)
-    writer.write(lines.joinToString("\n"))
-    writer.close()
+    file.alterarLinhaArquivo(index, funcionario.toString())
 
     println("\nFuncionário alterado com sucesso!")
 }
 
-fun removeFuncionario(file: File){
+fun removeFuncionario(file: Arquivo){
     val sc = Scanner(System.`in`)
-    val reader = FileReader(file)
 
     print("\n\n----- Remover Funcionário -----\n")
     print("\nInforme o nome do funcionário que deseja remover: ")
     val nome = sc.nextLine()
 
-    val lines = reader.readLines().toMutableList()
-    reader.close()
-
-    var index = -1
-    for ((i, line) in lines.withIndex()) {
-        val fields = line.split(",")
-        if (fields[0] == nome) {
-            index = i
-            break
-        }
-    }
-
+    val index = file.pesquisaLinhaPorIdentificador(nome)
     if (index == -1) {
         println("\nEste funcionário não foi encontrado.")
         menu()
     }
 
-    lines.removeAt(index)
-
-    val writer = FileWriter(file)
-    writer.write(lines.joinToString("\n"))
-    writer.close()
+    file.removerLinhaArquivo(index)
 
     println("\nFuncionário removido com sucesso!")
 }
 
-fun listaFuncionario(file: File){
-    val reader = FileReader(file)
-
-    val lines = reader.readLines()
-    reader.close()
-
+fun listaFuncionario(file: Arquivo){
+    val lines = file.lerTotasAsLinhasArquivo()
     if (lines.size < 2) {
         println("Nenhum funcionário foi cadastrado.")
         return
     }
 
-    var id = 1
-    for (line in lines) {
-        val fields = line.split(",")
-
-        val nome = fields[0]
-        val cargo = fields[1]
-        val salario = fields[2]
-        if(fields[0] == "Nome do Funcionário")
-            println("ID \t\t | \t $nome \t | \t $cargo \t | \t $salario")
-        else {
-            println("$id \t\t | \t $nome \t\t | \t\t\t $cargo \t\t\t | \t\t\t R$$salario")
-            id++
-        }
-    }
+    file.imprimirLinhasArquivo(lines)
 }
