@@ -81,18 +81,22 @@ fun alteraFuncionario(file: Arquivo){
     print("\nInforme o nome do funcionário que deseja alterar: ")
     val nome = sc.nextLine()
 
-    val index = file.pesquisaLinhaPorIdentificador(nome)
+    var index = file.pesquisaLinhaPorIdentificador(nome)
     if (index == -1) {
         println("\nEste funcionário não foi encontrado.")
         menu(file)
     }
 
-    val countIdentificadores = file.verificaRepeticaoIdentificador(nome)
-    if(countIdentificadores > 1){
-        print("\nExiste mais de um funcionário com esse nome! O primeiro registro será alterado. " +
-                "\nDeseja continuar? \n1 - Sim \n2 - Não \nOpção: ")
-        if(sc.nextInt() == 2)
-            menu(file)
+    val repeticoes = file.verificaRepeticaoIdentificador(nome)
+    if(repeticoes.size > 1){
+        print("\nExiste mais de um funcionário com esse nome! \n")
+        for(r in repeticoes){
+            if (r != null) {
+                print("\nID:${r.getIndex()} \tNome: ${r.getNome()} \tCargo: ${r.getCargo()} \tSalário: R$${r.getSalario()}")
+            }
+        }
+        print("\n\nInforme o ID de qual deseja alterar: ")
+        index = sc.nextInt()
     }
     sc.nextLine()
 
@@ -115,18 +119,22 @@ fun removeFuncionario(file: Arquivo){
     print("\nInforme o nome do funcionário que deseja remover: ")
     val nome = sc.nextLine()
 
-    val index = file.pesquisaLinhaPorIdentificador(nome)
+    var index = file.pesquisaLinhaPorIdentificador(nome)
     if (index == -1) {
         println("\nEste funcionário não foi encontrado.")
         menu(file)
     }
 
-    val countIdentificadores = file.verificaRepeticaoIdentificador(nome)
-    if(countIdentificadores > 1){
-        print("\nExiste mais de um funcionário com esse nome! O primeiro registro será apagado. " +
-                "\nDeseja continuar? \n1 - Sim \n2 - Não \nOpção: ")
-        if(sc.nextInt() == 2)
-            menu(file)
+    val repeticoes = file.verificaRepeticaoIdentificador(nome)
+    if(repeticoes.size > 1){
+        print("\nExiste mais de um funcionário com esse nome! \n")
+        for(r in repeticoes){
+            if (r != null) {
+                print("\nID:${r.getIndex()} \tNome: ${r.getNome()} \tCargo: ${r.getCargo()} \tSalário: R$${r.getSalario()}")
+            }
+        }
+        print("\n\nInforme o ID de qual deseja apagar: ")
+        index = sc.nextInt()
     }
 
     file.removerLinhaArquivo(index)

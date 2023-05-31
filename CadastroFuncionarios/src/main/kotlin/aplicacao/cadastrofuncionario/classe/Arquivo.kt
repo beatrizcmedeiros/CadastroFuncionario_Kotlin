@@ -74,14 +74,18 @@ class Arquivo(private val file: File) {
         return -1
     }
 
-    fun verificaRepeticaoIdentificador(identificador: String): Int {
-        var count = 0
+    fun verificaRepeticaoIdentificador(identificador: String): Array<Funcionario?> {
+        var index = 0
+        var aux = 0
+        val repeticoes = arrayOfNulls<Funcionario>(5)
         for (line in lerTotasAsLinhasArquivo()) {
-            val ln = line.split(" ")
-            for (i in ln)
-                count++
+            if(line.contains(identificador)){
+                val ln = line.split(",")
+                repeticoes[aux++] = (Funcionario(index, ln[0], ln[1], ln[2].toDouble()))
+            }
+            index++
         }
-        return count
+        return repeticoes
     }
 
     fun imprimirLinhasArquivo(lines: List<String>){
